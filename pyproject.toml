@@ -1,0 +1,20 @@
+[project]
+name = "handover"
+version = "1.0.0"
+description = "Aplikasi Hand Over Serah Terima Mobil Tangki dan AMT Pertamina"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "flet>=0.86.0",
+]
+
+[tool.flet]
+org = "com.pertamina"
+product = "HandOver"
+company = "Pertamina"
+copyright = "Copyright (C) 2026 Pertamina"
+
+[tool.flet.app]
+path = "."
+module = "main"
+
