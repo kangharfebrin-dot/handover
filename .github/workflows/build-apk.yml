@@ -17,60 +17,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: "temurin"
-          java-version: "17"
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Build Android APK
+      - name: Build APK
         id: build
         uses: flet-dev/flet-build-action@v1
         with:
           target: apk
-          runner-python-version: "3.11"
-          bundled-python-version: "3.11"
           build-number: ${{ github.run_number }}
-          build-version: "1.0.${{ github.run_number }}"
 
-      - name: Locate APK file
+      - name: Prepare APK Release
         id: find_apk
         run: |
-          echo "Build output path: ${{ steps.build.outputs.output-path }}"
           APK_PATH=$(find ${{ steps.build.outputs.output-path }} -name "*.apk" | head -n 1)
-          if [ -z "$APK_PATH" ]; then
-            echo "Searching in workspace..."
-            APK_PATH=$(find . -name "*.apk" | head -n 1)
-          fi
-          echo "Found APK at: $APK_PATH"
           CLEAN_NAME="HandOver-v1.0.${{ github.run_number }}.apk"
           cp "$APK_PATH" "$CLEAN_NAME"
           echo "apk_path=$CLEAN_NAME" >> $GITHUB_OUTPUT
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: HandOver-Android-APK
-          path: ${{ steps.find_apk.outputs.apk_path }}
-          if-no-files-found: error
-
-      - name: Create GitHub Release with APK
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: "v1.0.${{ github.run_number }}"
           name: "Hand Over Pertamina v1.0.${{ github.run_number }}"
           body: |
             ### ?? Rilis Aplikasi Android (.apk)
-            
-            Unduh file APK di bawah ini dan langsung pasang (install) di perangkat Android Anda:
-            - **Nama Aplikasi**: Hand Over MT & AMT Pertamina
-            - **Versi**: 1.0.${{ github.run_number }}
-            - **Build**: ${{ github.sha }}
-          files: |
-            ${{ steps.find_apk.outputs.apk_path }}
+            Silakan unduh file APK di bawah ini dan langsung pasang (install) di perangkat Android Anda.
+          files: ${{ steps.find_apk.outputs.apk_path }}
           draft: false
           prerelease: false
 
